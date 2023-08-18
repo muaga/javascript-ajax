@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <h1>카테고리별 기술 목록보기</h1>
+    <hr />
+    <select id="category" onchange="onCategoryChange()">
+
+    </select>
+    <select id="tech">
+
+    </select>
+
+    <script>
+        // v1
+        async function fetchCategory() {
+            // ● download
+            let response = await fetch("/api/category");
+            // 3. 해당 URL링크를 통해 JSON타입의 데이터를 다운받는다.
+            // await를 통해 통신이 되는 동안 다운로드 성공을 하게 한다.
+
+            let body = await response.json();
+            // 4. JSON타입 -> JS오브젝트타입으로 변경
+            // 모든 통신에서 데이터를 받으면, 본인의 언어로 변경해야 한다.
+
+
+            // ● dom 제어
+            let categoryEl = document.querySelector("#category");
+            // 5. id가 category인 select를 찾는다.
+
+            for (c of body) {
+                let optionEl = document.createElement("option");
+                optionEl.value = c.id; // pk
+                optionEl.innerHTML = c.name;
+                categoryEl.append(optionEl);
+            }
+            // 6. for-each
+            // 1) 
+            //console.log(body);
+        }
+
+        // v2
+        async function fetchTech(categoryId) {
+            // ● download
+            let response = await fetch("/api/tech?categoryId=" + categoryId);
+            let body = await response.json();
+
+            // ● 옵션 초기화
+            let techEl = document.querySelector("#tech");
+            techEl.innerHTML = ""; // Clear previous options
+            // 옵션을 초기화하지 않으면
+            // category가 달라질 때, 기존 옵션에 추가로 된다.
+
+            // ● dom 제어
+            for (t of body) {
+                let optionEl = document.createElement("option");
+                optionEl.value = t.id;
+                optionEl.innerHTML = t.name;
+                techEl.append(optionEl);
+            }
+        }
+
+        // v2
+        async function onCategoryChange() {
+            let categoryEl = document.querySelector("#category");
+            // 카테고리의 변화가 생길 때
+            let selectedCategoryId = categoryEl.value;
+            // 현재 선택되어 있는 value를 찾는다.
+            fetchTech(selectedCategoryId);
+            // 그 value를 다운받는다.
+        }
+
+
+        // 화면초기화
+        // fetchCategory();
+        // fetchTech(1);
+    </script>
+</body>
+
+
+</html>
